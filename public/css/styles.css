@@ -1,0 +1,489 @@
+:root {
+    --loantap-primary: #7B4397;
+    --loantap-secondary: #DC2586;
+    --loantap-bg: #e8daf0;
+    --loantap-text-primary: #333333;
+    --loantap-text-secondary: #666666;
+    --loantap-border: #ddd;
+}
+
+body {
+    background: linear-gradient(135deg, #e8daf0 0%, #ddd0e8 100%);
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 8px 0;
+    margin-bottom: 0;
+}
+
+.navbar .container {
+    padding: 0 20px;
+}
+
+.logo-placeholder {
+    width: 140px;
+    height: 35px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.application-status {
+    background-color: white;
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin: 12px 0 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.application-status span {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+}
+
+.main-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin: 0 0 20px 0;
+}
+
+.container {
+    padding: 0 20px;
+    max-width: 1200px;
+}
+
+.sidebar {
+    background: linear-gradient(180deg, #f8f6fb 0%, #f0ebf5 100%);
+    padding: 30px 20px 25px 20px;
+    border-right: 1px solid #e0e0e0;
+    min-height: 100%;
+}
+
+.sidebar h4 {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: 0;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #7B4397, #DC2586);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 12px;
+    margin-right: 10px;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.step-number.inactive {
+    background: #ccc;
+}
+
+.step-title {
+    font-weight: 400;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 28px;
+    width: 2px;
+    height: 20px;
+    background-color: #ddd;
+    z-index: 1;
+}
+
+.form-section {
+    padding: 30px 25px 25px 25px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 400;
+    color: #333;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    background: white;
+    line-height: 1.3;
+    height: 35px;
+}
+
+.form-control:focus {
+    border-color: #7B4397;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(123, 67, 151, 0.1);
+}
+
+.form-control::placeholder {
+    color: #999;
+    font-size: 12px;
+}
+
+.input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-group-text {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-right: none;
+    padding: 10px 10px;
+    border-radius: 4px 0 0 4px;
+    display: flex;
+    align-items: center;
+    color: #666;
+    font-size: 12px;
+    width: 35px;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+}
+
+.btn-otp {
+    background: linear-gradient(45deg, #7B4397, #DC2586);
+    border: none;
+    color: white;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+    height: 35px;
+}
+
+.btn-otp:hover {
+    opacity: 0.9;
+}
+
+/* OTP Verification Field - Hidden by default */
+.otp-verification {
+    margin-top: 10px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.otp-verification.show {
+    opacity: 1;
+    max-height: 100px;
+}
+
+.otp-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.otp-input-group .input-group {
+    flex: 1;
+}
+
+.btn-verify {
+    background: linear-gradient(45deg, #7B4397, #DC2586);
+    border: none;
+    color: white;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+    height: 35px;
+    white-space: nowrap;
+}
+
+.btn-verify:hover {
+    opacity: 0.9;
+}
+
+.btn-resend {
+    background: transparent;
+    border: 1px solid #7B4397;
+    color: #7B4397;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+    height: 35px;
+    white-space: nowrap;
+}
+
+.btn-resend:hover:not(:disabled) {
+    background: #7B4397;
+    color: white;
+}
+
+.btn-resend:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #ccc;
+    color: #ccc;
+}
+
+.consent-section {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin: 15px 0;
+}
+
+.form-check {
+    display: flex;
+    align-items: flex-start;
+}
+
+.form-check-input {
+    margin-right: 6px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.consent-text {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.3;
+}
+
+.read-more {
+    color: #7B4397;
+    text-decoration: none;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.btn-continue {
+    background: linear-gradient(45deg, #7B4397, #DC2586);
+    border: none;
+    color: white;
+    padding: 12px 40px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 3px;
+}
+
+.btn-continue:hover {
+    opacity: 0.9;
+}
+
+.btn-back {
+    background: transparent;
+    border: 1px solid var(--loantap-primary);
+    color: var(--loantap-primary);
+    padding: 12px 40px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 3px;
+}
+
+.btn-back:hover {
+    background: var(--loantap-primary);
+    color: white;
+}
+
+.form-step {
+    transition: all 0.3s ease-in-out;
+}
+
+.form-step.active {
+    display: block;
+}
+
+#nameSection .text-success {
+    color: #28a745 !important;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.footer-text {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.bottom-footer {
+    background: #2d2d2d;
+    color: white;
+    padding: 12px 0;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 20px;
+}
+
+.disclaimer-btn {
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .main-container {
+        margin: 0 0 15px 0;
+        border-radius: 6px;
+    }
+    
+    .sidebar {
+        padding: 20px 15px 20px 15px;
+    }
+
+    .sidebar h4 {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .step-item {
+        margin-bottom: 15px;
+    }
+
+    .step-number {
+        width: 25px;
+        height: 25px;
+        font-size: 11px;
+        margin-right: 8px;
+    }
+
+    .step-title {
+        font-size: 13px;
+    }
+
+    .step-item:not(:last-child)::after {
+        left: 12px;
+        height: 15px;
+    }
+    
+    .form-section {
+        padding: 20px 15px 15px 15px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .application-status {
+        margin: 8px 0;
+        padding: 6px 12px;
+    }
+
+    .navbar {
+        padding: 6px 0;
+    }
+
+    .navbar .container {
+        padding: 0 15px;
+    }
+
+    .footer-text {
+        margin-top: 20px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 576px) {
+    .row.g-2 {
+        --bs-gutter-x: 0.125rem;
+    }
+
+    .btn-otp {
+        font-size: 11px;
+        padding: 10px 6px;
+    }
+
+    .form-control, .input-group-text {
+        font-size: 11px;
+        padding: 9px 10px;
+        height: 33px;
+    }
+
+    .input-group-text {
+        width: 30px;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+}
