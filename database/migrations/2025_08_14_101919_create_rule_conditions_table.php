@@ -6,20 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('rule_conditions', function (Blueprint $table) {
-            $table->id();
+            $table->id('condition_id');
+            $table->unsignedBigInteger('rule_id');
+            $table->string('variable_id', 64)->collation('utf8mb4_unicode_ci');
+            $table->string('operator');
+            $table->string('value');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
+
+            $table->foreign('rule_id')->references('rule_id')->on('rules')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('rule_conditions');

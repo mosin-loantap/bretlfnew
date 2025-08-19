@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('rule_actions', function (Blueprint $table) {
-            $table->id();
+            $table->id('action_id');
+            $table->unsignedBigInteger('rule_id');
+            $table->unsignedBigInteger('partner_id');
+            $table->string('action_type'); // approve, reject, refer, set_interest_rate
+            $table->string('parameters')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
+
+            $table->foreign('rule_id')->references('rule_id')->on('rules')->onDelete('cascade');
+        
         });
     }
 
