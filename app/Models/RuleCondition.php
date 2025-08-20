@@ -13,7 +13,7 @@ class RuleCondition extends Model
 
     protected $fillable = [
         'rule_id',
-        'variable_id',
+        'variable_name',
         'operator',
         'value',
         'created_by',
@@ -25,8 +25,13 @@ class RuleCondition extends Model
         return $this->belongsTo(Rule::class, 'rule_id', 'rule_id');
     }
 
-    public function variable()
+    /**
+     * Get the variable data type from the variables table
+     * This is optional - for validation purposes
+     */
+    public function getVariableDataType()
     {
-        return $this->belongsTo(Variable::class, 'variable_id', 'variable_id');
+        $variable = Variable::where('variable_name', $this->variable_name)->first();
+        return $variable ? $variable->data_type : 'string';
     }
 }

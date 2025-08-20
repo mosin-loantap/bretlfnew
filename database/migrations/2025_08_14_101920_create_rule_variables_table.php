@@ -20,22 +20,13 @@ return new class extends Migration
             $table->string('source');
             $table->timestamps();
         });
-
-        // Add foreign key constraint for rule_conditions after rule_variables table is created
-        Schema::table('rule_conditions', function (Blueprint $table) {
-            $table->foreign('variable_id')->references('variable_id')->on('rule_variables')->onDelete('cascade');
-        });
     }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
-    {
-        Schema::table('rule_conditions', function (Blueprint $table) {
-            $table->dropForeign(['variable_id']);
-        });
-        
+    {        
         Schema::dropIfExists('rule_variables');
     }
 };

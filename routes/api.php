@@ -8,7 +8,8 @@ use App\Http\Controllers\{
     RuleController,
     ConditionController,
     ActionController,
-    ApplicationController
+    ApplicationController,
+    EvaluateLoanController
 };
     
 
@@ -38,3 +39,6 @@ Route::apiResource('rules', RuleController::class);
 Route::apiResource('conditions', ConditionController::class);
 Route::apiResource('actions', ActionController::class);
 Route::apiResource('applications', ApplicationController::class);
+
+// Rule evaluation endpoint
+Route::post('evaluate', [EvaluateLoanController::class, 'evaluate']);

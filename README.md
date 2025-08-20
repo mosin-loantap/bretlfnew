@@ -1,66 +1,266 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BRE for Financial Products
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based Business Rules Engine (BRE) for financial products that allows multiple NBFC partners to define and apply rules dynamically.
 
-## About Laravel
+## 🎯 Domain Context
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This is an API-first Laravel application designed for:
+- Multiple NBFC (Non-Banking Financial Company) partners
+- Dynamic rule definition and management for financial products
+- Database-driven configuration of products, rules, conditions, variables, and actions
+- Real-time loan application evaluation against business rules
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📊 Database Schema
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Core Tables
 
-## Learning Laravel
+#### `partners`
+Stores NBFC partner information
+- `partner_id` (auto-increment primary key)
+- `NBFCName`
+- `RegistrationNumber`
+- `RBI_LicenseType`
+- `Date_of_incorporation`
+- `BusinessLimit`
+- `created_by`, `updated_by` (audit fields)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+#### `products`
+Defines loan products (Personal Loan, Business Loan, etc.)
+- `product_id` (auto-increment primary key)
+- `name`
+- `description`
+- `created_by`, `updated_by`
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+#### `rules`
+Business rules linked to products
+- `rule_id` (auto-increment primary key)
+- `product_id` (foreign key to products)
+- `name`
+- `priority`
+- `status`
+- `created_by`, `updated_by`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### `rule_conditions`
+Stores conditions within a rule
+- `condition_id` (auto-increment primary key)
+- `rule_id` (foreign key to rules)
+- `variable_id` (foreign key to variables)
+- `operator`
+- `value`
+- `created_by`, `updated_by`
 
-## Laravel Sponsors
+#### `variables`
+Dynamic fields used in rules (salary, age, credit score, etc.)
+- `variable_id` (auto-increment primary key)
+- `name`
+- `data_type`
+- `description`
+- `created_by`, `updated_by`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### `actions`
+Defines what happens when a rule matches (approve, reject, refer, etc.)
+- `action_id` (auto-increment primary key)
+- `rule_id` (foreign key to rules)
+- `action_type`
+- `parameters`
+- `created_by`, `updated_by`
 
-### Premium Partners
+### Relationships
+- Partner `hasMany` Products
+- Product `hasMany` Rules
+- Rule `hasMany` RuleConditions and `hasMany` Actions
+- RuleCondition `belongsTo` Variable
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## 🚀 Setup Instructions
 
-## Contributing
+### Prerequisites
+- PHP 8.1+
+- Composer
+- Laravel 11.x
+- SQLite/MySQL database
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Installation
 
-## Code of Conduct
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd breltf
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. Install dependencies
+```bash
+composer install
+npm install
+```
 
-## Security Vulnerabilities
+3. Environment setup
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. Database setup
+```bash
+php artisan migrate:fresh --seed
+```
 
-## License
+## 📋 Current Implementation Status
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### ✅ Completed
+- [x] Database schema design and migrations
+- [x] Eloquent models with relationships
+- [x] API controllers with validation
+- [x] Demo seeders for all tables
+- [x] Basic CRUD operations
+
+### 🔄 In Progress
+- [ ] Rule evaluation engine
+- [ ] API authentication (JWT/Laravel Passport)
+- [ ] Request/Response logging middleware
+- [ ] Admin panel (Filament/Bootstrap UI)
+- [ ] Bulk demo data with Faker factories
+
+## 🛠 Models
+
+### Core Models
+- `Partner` - NBFC partner management
+- `Product` - Financial product definitions
+- `Rule` - Business rule configuration
+- `RuleCondition` - Rule condition logic
+- `Variable` - Dynamic field definitions
+- `Action` - Rule outcome actions
+
+## 🔗 API Endpoints
+
+### Planned API Structure
+```
+/api/partners     - Manage NBFC partners
+/api/products     - Manage loan products
+/api/rules        - Manage business rules
+/api/conditions   - Manage rule conditions
+/api/variables    - Manage dynamic fields
+/api/actions      - Manage rule actions
+/api/evaluate     - Evaluate loan applications
+```
+
+## 📝 Seeders
+
+Demo data includes:
+- **PartnerSeeder**: Demo NBFC partner (Loantap)
+- **ProductSeeder**: Personal Loan, Business Loan products
+- **VariableSeeder**: Variables like salary, age
+- **RuleSeeder**: Sample rule for Personal Loan
+- **RuleConditionSeeder**: Conditions (salary ≥ 30000, age ≥ 21)
+- **ActionSeeder**: Approval action with max_amount = 500000
+
+Run seeders:
+```bash
+php artisan migrate:fresh --seed
+```
+
+## 🏗 Architecture
+
+### Key Features
+- **API-First Design**: RESTful APIs for all operations
+- **Audit Trail**: All tables include `created_by`, `updated_by` tracking
+- **Foreign Key Relationships**: Proper database integrity
+- **Validation**: Request validation in controllers
+- **Seeding**: Demo data for development and testing
+
+### Tech Stack
+- **Backend**: Laravel 11.x
+- **Database**: SQLite (development), MySQL (production)
+- **Authentication**: Laravel Passport (planned)
+- **Admin Panel**: Filament (planned)
+- **Frontend**: API-first (can be consumed by any frontend)
+
+## 🔧 Development Commands
+
+```bash
+# Run migrations
+php artisan migrate
+
+# Fresh migration with seeders
+php artisan migrate:fresh --seed
+
+# Create new migration
+php artisan make:migration create_table_name
+
+# Create new model
+php artisan make:model ModelName
+
+# Create new controller
+php artisan make:controller ControllerName
+
+# Create new seeder
+php artisan make:seeder SeederName
+
+# Run specific seeder
+php artisan db:seed --class=SeederName
+```
+
+## 📁 Project Structure
+
+```
+app/
+├── Http/Controllers/    # API Controllers
+├── Models/             # Eloquent Models
+├── Services/           # Business Logic Services
+└── Providers/          # Service Providers
+
+database/
+├── migrations/         # Database Migrations
+├── seeders/           # Data Seeders
+└── factories/         # Model Factories
+
+config/                # Configuration files
+routes/
+├── api.php           # API Routes
+└── web.php           # Web Routes
+```
+
+## 🎯 Next Development Steps
+
+1. **Rule Evaluation Engine**
+   - Implement dynamic rule evaluation logic
+   - Create loan application evaluation API
+   - Add rule priority and conflict resolution
+
+2. **Authentication & Security**
+   - Implement JWT/Laravel Passport
+   - Add API rate limiting
+   - Partner-specific access control
+
+3. **Logging & Audit**
+   - Request/Response logging middleware
+   - Database audit trail
+   - Performance monitoring
+
+4. **Admin Interface**
+   - Filament admin panel for rule management
+   - Rule builder UI
+   - Analytics dashboard
+
+5. **Testing & Documentation**
+   - Unit tests for rule evaluation
+   - API documentation (OpenAPI/Swagger)
+   - Performance testing
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+---
+
+**Repository**: bretlfnew  
+**Owner**: mosin-loantap  
+**Current Branch**: main  
+**Last Updated**: August 20, 2025

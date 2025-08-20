@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('rule_conditions', function (Blueprint $table) {
             $table->id('condition_id');
             $table->unsignedBigInteger('rule_id');
-            $table->string('variable_id', 64)->collation('utf8mb4_unicode_ci');
+            $table->string('variable_name');
             $table->string('operator');
             $table->string('value');
             $table->unsignedBigInteger('created_by')->nullable();
