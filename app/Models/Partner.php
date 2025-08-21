@@ -14,6 +14,12 @@ class Partner extends Model
         'rbi_license_type',
         'date_of_incorporation',
         'business_limit',
+        'registered_address',
+        'contact_person',
+        'contact_email',
+        'phone_number',
+        'website_url',
+        'is_active',
         'created_by',
         'updated_by'
     ];

@@ -12,6 +12,7 @@ class Product extends Model
         'partner_id',
         'product_name',
         'product_type',
+        'product_category',
         'min_amount',
         'max_amount',
         'min_tenure',

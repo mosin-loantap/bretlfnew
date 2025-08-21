@@ -11,6 +11,7 @@ class Action extends Model
 
     protected $fillable = [
         'rule_id',
+        'partner_id',
         'action_type',
         'parameters',
         'created_by',
@@ -20,5 +21,10 @@ class Action extends Model
     public function rule()
     {
         return $this->belongsTo(Rule::class, 'rule_id');
+    }
+
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class, 'partner_id', 'partner_id');
     }
 }

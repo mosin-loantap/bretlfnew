@@ -19,4 +19,9 @@ class Variable extends Model
         'data_type',
         'source',
     ];
+
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class, 'partner_id', 'partner_id');
+    }
 }
