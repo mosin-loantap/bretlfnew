@@ -66,4 +66,5 @@ Route::prefix('api/bre')->name('api.bre.')->group(function () {
     Route::put('/conditions/{id}', [BREController::class, 'conditionUpdate'])->name('conditions.update');
     Route::delete('/conditions/{id}', [BREController::class, 'conditionDestroy'])->name('conditions.destroy');
     Route::get('/actions/{id}', [BREController::class, 'actionShow'])->name('actions.show');
+
 });

@@ -16,7 +16,7 @@ class BREController extends Controller
 {
     protected $ruleEvaluationService;
 
-    public function __construct(RuleEvaluationService $ruleEvaluationService)
+    public function __construct(RuleEvaluationService $ruleEvaluationService = null)
     {
         $this->ruleEvaluationService = $ruleEvaluationService;
     }
@@ -357,5 +357,118 @@ class BREController extends Controller
         $condition->delete();
 
         return response()->json(['message' => 'Condition deleted successfully']);
+    }
+
+    /**
+     * API method to get complete BRE rules for a partner and product
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductRules(Request $request)
+    {
+        try {
+            // Debug: Log the request
+            \Log::info('Product Rules API called', $request->all());
+            
+            // Validate input
+            $request->validate([
+                'partner_id' => 'required|integer|exists:partners,partner_id',
+                'product_name' => 'required|string'
+            ]);
+
+            $partnerId = $request->partner_id;
+            $productName = $request->product_name;
+
+            // Find the partner
+            $partner = Partner::find($partnerId);
+            if (!$partner) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Partner not found'
+                ], 404);
+            }
+
+            // Find the product by name for this partner
+            $product = Product::where('partner_id', $partnerId)
+                              ->where('product_name', $productName)
+                              ->first();
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Product '$productName' not found for partner '{$partner->nbfc_name}'"
+                ], 404);
+            }
+
+            // Get active rules for this product
+            $rules = Rule::where('product_id', $product->product_id)
+                          ->where('status', 1)
+                          ->with(['conditions', 'actions'])
+                          ->orderBy('priority', 'desc')
+                          ->get();
+
+            \Log::info('Rules query result', [
+                'product_id' => $product->product_id,
+                'rules_count' => $rules->count(),
+                'rule_ids' => $rules->pluck('rule_id')->toArray()
+            ]);
+
+            // Format response
+            $data = $rules->map(function ($rule) {
+                return [
+                    // 'id' => $rule->rule_id,
+                    'rule_name' => $rule->rule_name,
+                    'description' => $rule->description,
+                    'priority' => $rule->priority,
+                    'status' => $rule->status,
+                    'effective_from' => $rule->effective_from,
+                    'effective_to' => $rule->effective_to,
+                    'conditions' => $rule->conditions->map(function ($condition) {
+                        return [
+                            // 'id' => $condition->condition_id,
+                            'variable_name' => $condition->variable_name,
+                            'operator' => $condition->operator,
+                            'value' => $condition->value
+                        ];
+                    }),
+                    'actions' => $rule->actions->map(function ($action) {
+                        return [
+                            // 'id' => $action->action_id,
+                            'action_type' => $action->action_type,
+                            'parameters' => $action->parameters ? json_decode($action->parameters, true) : null
+                        ];
+                    })
+                ];
+            });
+
+
+                // API response logging
+                 \Log::info('Rules query result', [
+                    'partner' => $partner->nbfc_name,
+                    'product' => $product->product_name,
+                    'rules_count' => $rules->count(),
+                    'data' => $data->values()->all()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product rules retrieved successfully',
+                'partner' => $partner->nbfc_name,
+                'product' => $product->product_name,
+                'rules_count' => $rules->count(),
+                'data' => $data->values()->all()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Product Rules API Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

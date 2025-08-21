@@ -9,7 +9,8 @@ use App\Http\Controllers\{
     ConditionController,
     ActionController,
     ApplicationController,
-    EvaluateLoanController
+    EvaluateLoanController,
+    BREController
 };
     
 
@@ -42,3 +43,8 @@ Route::apiResource('applications', ApplicationController::class);
 
 // Rule evaluation endpoint
 Route::post('evaluate', [EvaluateLoanController::class, 'evaluate']);
+
+// BRE API endpoints
+Route::prefix('bre')->group(function () {
+    Route::post('product-rules', [BREController::class, 'getProductRules']);
+});
