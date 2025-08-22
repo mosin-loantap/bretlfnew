@@ -9,7 +9,10 @@ class RuleController extends Controller
 {
     public function index()
     {
-        return response()->json(Rule::all());
+        $rules = Rule::with(['partner', 'product'])
+                     ->orderBy('created_at', 'desc')
+                     ->get();
+        return response()->json(['data' => $rules]);
     }
 
     public function store(Request $request)
@@ -35,7 +38,8 @@ class RuleController extends Controller
 
     public function show($id)
     {
-        return response()->json(Rule::findOrFail($id));
+        $rule = Rule::with(['partner', 'product', 'conditions', 'actions'])->findOrFail($id);
+        return response()->json($rule);
     }
 
     public function update(Request $request, $id)
@@ -50,14 +54,18 @@ class RuleController extends Controller
             'priority' => 'required|integer|min:1',
             'effective_from' => 'required|date',
             'effective_to' => 'nullable|date|after_or_equal:effective_from',
-            'status' => 'required|in:active,inactive',
+            'status' => 'boolean',
         ]);
 
-        $rule->update($validated + [
-            'updated_by' => auth()->id(),
-        ]);
+        $validated['updated_by'] = 1;
 
-        return response()->json($rule);
+        $rule->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rule updated successfully',
+            'data' => $rule->fresh()
+        ]);
     }
 
     public function destroy($id)

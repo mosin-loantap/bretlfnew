@@ -201,6 +201,52 @@ class BREController extends Controller
             ->with('success', 'Rule created successfully!');
     }
 
+    public function ruleShow($id)
+    {
+        $rule = Rule::with(['partner', 'product', 'conditions', 'actions'])->findOrFail($id);
+        return response()->json([
+            'success' => true,
+            'data' => $rule
+        ]);
+    }
+
+    public function ruleUpdate(Request $request, $id)
+    {
+        $rule = Rule::findOrFail($id);
+        
+        $validated = $request->validate([
+            'partner_id' => 'required|exists:partners,partner_id',
+            'product_id' => 'required|exists:products,product_id',
+            'rule_name' => 'required|string|max:255',
+            'rule_type' => 'required|string|max:255',
+            'priority' => 'required|integer|min:1',
+            'effective_from' => 'required|date',
+            'effective_to' => 'nullable|date|after:effective_from',
+            'status' => 'boolean',
+        ]);
+
+        $validated['updated_by'] = 1;
+
+        $rule->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rule updated successfully!',
+            'rule' => $rule->fresh()
+        ]);
+    }
+
+    public function ruleDestroy($id)
+    {
+        $rule = Rule::findOrFail($id);
+        $rule->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rule deleted successfully!'
+        ]);
+    }
+
     /**
      * Conditions Management
      */

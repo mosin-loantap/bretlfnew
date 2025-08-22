@@ -59,6 +59,8 @@ Route::prefix('api/bre')->name('api.bre.')->group(function () {
     Route::get('/partners/{id}/products', [BREController::class, 'partnerProducts'])->name('partners.products');
     Route::get('/products/{id}', [BREController::class, 'productShow'])->name('products.show');
     Route::get('/rules/{id}', [BREController::class, 'ruleShow'])->name('rules.show');
+    Route::put('/rules/{id}', [BREController::class, 'ruleUpdate'])->name('rules.update');
+    Route::delete('/rules/{id}', [BREController::class, 'ruleDestroy'])->name('rules.destroy');
     Route::get('/variables', [BREController::class, 'variablesApi'])->name('variables.index');
     Route::get('/variables/{id}', [BREController::class, 'variableShow'])->name('variables.show');
     Route::get('/conditions', [BREController::class, 'conditionsApi'])->name('conditions.index');

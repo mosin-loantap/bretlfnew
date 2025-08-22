@@ -399,7 +399,7 @@ $('#editRuleForm').on('submit', function(e) {
     clearEditErrors();
     
     $.ajax({
-        url: '/api/rules/' + editingRuleId,
+        url: '/api/bre/rules/' + editingRuleId,
         method: 'PUT',
         data: $(this).serialize(),
         success: function(response) {
@@ -426,7 +426,7 @@ $('#confirmDeleteBtn').on('click', function() {
     btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Deleting...');
     
     $.ajax({
-        url: '/api/rules/' + deleteRuleId,
+        url: '/api/bre/rules/' + deleteRuleId,
         method: 'DELETE',
         success: function(response) {
             showAlert('Rule deleted successfully!', 'success');
@@ -533,7 +533,7 @@ function renderRules(rules) {
     
     let html = '';
     rules.forEach(rule => {
-        const statusBadge = rule.is_active ? 
+        const statusBadge = rule.status ? 
             '<span class="badge bg-success">Active</span>' : 
             '<span class="badge bg-secondary">Inactive</span>';
         
@@ -543,7 +543,7 @@ function renderRules(rules) {
         const actionsCount = rule.actions_count || rule.actions?.length || 0;
         
         html += `
-            <tr data-partner-id="${rule.partner_id}" data-status="${rule.is_active}">
+            <tr data-partner-id="${rule.partner_id}" data-status="${rule.status}">
                 <td>
                     <strong>${rule.rule_name}</strong>
                     ${rule.description ? `<br><small class="text-muted">${rule.description.substring(0, 50)}${rule.description.length > 50 ? '...' : ''}</small>` : ''}
@@ -563,13 +563,13 @@ function renderRules(rules) {
                 <td>${statusBadge}</td>
                 <td class="text-center">
                     <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-info" onclick="viewRule(${rule.id})" title="View Details">
+                        <button type="button" class="btn btn-outline-info" onclick="viewRule(${rule.rule_id})" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-primary" onclick="editRule(${rule.id})" title="Edit">
+                        <button type="button" class="btn btn-outline-primary" onclick="editRule(${rule.rule_id})" title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger" onclick="deleteRule(${rule.id}, '${rule.rule_name}')" title="Delete">
+                        <button type="button" class="btn btn-outline-danger" onclick="deleteRule(${rule.rule_id}, '${rule.rule_name}')" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -583,9 +583,10 @@ function renderRules(rules) {
 
 function viewRule(ruleId) {
     $.ajax({
-        url: '/api/rules/' + ruleId,
+        url: '/api/bre/rules/' + ruleId,
         method: 'GET',
-        success: function(rule) {
+        success: function(response) {
+            const rule = response.data || response;
             const modalBody = $('#ruleDetailsBody');
             
             modalBody.html(`
@@ -596,7 +597,7 @@ function viewRule(ruleId) {
                             <tr><td><strong>Rule Name:</strong></td><td>${rule.rule_name}</td></tr>
                             <tr><td><strong>Type:</strong></td><td>${rule.rule_type || 'eligibility'}</td></tr>
                             <tr><td><strong>Priority:</strong></td><td>${rule.priority}</td></tr>
-                            <tr><td><strong>Status:</strong></td><td>${rule.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td></tr>
+                            <tr><td><strong>Status:</strong></td><td>${rule.status ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td></tr>
                             <tr><td><strong>Created:</strong></td><td>${new Date(rule.created_at).toLocaleDateString()}</td></tr>
                         </table>
                     </div>
@@ -664,16 +665,17 @@ function viewRule(ruleId) {
 
 function editRule(ruleId) {
     $.ajax({
-        url: '/api/rules/' + ruleId,
+        url: '/api/bre/rules/' + ruleId,
         method: 'GET',
-        success: function(rule) {
+        success: function(response) {
+            const rule = response.data || response;
             editingRuleId = ruleId;
             
-            $('#edit_rule_id').val(rule.id);
+            $('#edit_rule_id').val(rule.rule_id);
             $('#edit_partner_id').val(rule.partner_id);
             $('#edit_rule_name').val(rule.rule_name);
             $('#edit_priority').val(rule.priority);
-            $('#edit_is_active').val(rule.is_active ? '1' : '0');
+            $('#edit_is_active').val(rule.status ? '1' : '0');
             $('#edit_rule_type').val(rule.rule_type || 'eligibility');
             $('#edit_effective_from').val(rule.effective_from);
             $('#edit_effective_to').val(rule.effective_to);
