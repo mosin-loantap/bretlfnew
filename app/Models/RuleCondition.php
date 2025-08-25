@@ -16,6 +16,8 @@ class RuleCondition extends Model
         'variable_name',
         'operator',
         'value',
+        'marks',
+        'is_mandatory',
         'created_by',
         'updated_by',
     ];

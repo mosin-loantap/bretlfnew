@@ -71,6 +71,28 @@
                 </div>
             </div>
             
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="marks" class="form-label">Marks <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="marks" name="marks" min="0" max="100" value="10" required>
+                        <div class="form-text">Points awarded if condition is met</div>
+                        <div class="invalid-feedback" id="marks_error"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="is_mandatory" class="form-label">Mandatory</label>
+                        <select class="form-select" id="is_mandatory" name="is_mandatory">
+                            <option value="0" selected>No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                        <div class="form-text">If Yes, rule fails when this condition is not met</div>
+                        <div class="invalid-feedback" id="is_mandatory_error"></div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="d-flex justify-content-end">
                 <button type="button" class="btn btn-secondary me-2" onclick="resetForm()">
                     <i class="fas fa-undo"></i> Reset
@@ -106,12 +128,14 @@
                         <th>Variable</th>
                         <th>Operator</th>
                         <th>Value</th>
+                        <th>Marks</th>
+                        <th>Mandatory</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="conditionsTableBody">
                     <tr>
-                        <td colspan="5" class="text-center">
+                        <td colspan="7" class="text-center">
                             <div class="spinner-border spinner-border-sm me-2" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -189,6 +213,28 @@
                                 <label for="edit_value" class="form-label">Value <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="edit_value" name="value" required>
                                 <div class="invalid-feedback" id="edit_value_error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_marks" class="form-label">Marks <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="edit_marks" name="marks" min="0" max="100" required>
+                                <div class="form-text">Points awarded if condition is met</div>
+                                <div class="invalid-feedback" id="edit_marks_error"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_is_mandatory" class="form-label">Mandatory</label>
+                                <select class="form-select" id="edit_is_mandatory" name="is_mandatory">
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <div class="form-text">If Yes, rule fails when this condition is not met</div>
+                                <div class="invalid-feedback" id="edit_is_mandatory_error"></div>
                             </div>
                         </div>
                     </div>
@@ -347,7 +393,7 @@ $('#confirmDeleteBtn').on('click', function() {
 
 function loadRules() {
     $.ajax({
-        url: '/api/rules',
+        url: '/api/bre/rules',
         method: 'GET',
         success: function(response) {
             const rules = response.data || response;
@@ -432,7 +478,7 @@ function renderConditions(conditions) {
     if (conditions.length === 0) {
         tbody.html(`
             <tr>
-                <td colspan="5" class="text-center text-muted">
+                <td colspan="7" class="text-center text-muted">
                     <i class="fas fa-filter fa-2x mb-2"></i><br>
                     No conditions found
                 </td>
@@ -460,6 +506,12 @@ function renderConditions(conditions) {
                 <td>
                     <strong>${condition.value}</strong>
                 </td>
+                <td>
+                    <span class="badge bg-secondary">${condition.marks || 0} pts</span>
+                </td>
+                <td>
+                    ${condition.is_mandatory ? '<span class="badge bg-danger">Yes</span>' : '<span class="badge bg-success">No</span>'}
+                </td>
                 <td class="text-center">
                     <div class="btn-group btn-group-sm" role="group">
                         <button type="button" class="btn btn-outline-primary" onclick="editCondition(${condition.condition_id})" title="Edit">
@@ -481,7 +533,8 @@ function editCondition(conditionId) {
     $.ajax({
         url: '/api/bre/conditions/' + conditionId,
         method: 'GET',
-        success: function(condition) {
+        success: function(response) {
+            const condition = response.data || response;
             editingConditionId = conditionId;
             
             $('#edit_condition_id').val(condition.condition_id);
@@ -489,6 +542,8 @@ function editCondition(conditionId) {
             $('#edit_variable_name').val(condition.variable_name);
             $('#edit_operator').val(condition.operator);
             $('#edit_value').val(condition.value);
+            $('#edit_marks').val(condition.marks || 0);
+            $('#edit_is_mandatory').val(condition.is_mandatory ? '1' : '0');
             
             clearEditErrors();
             $('#editConditionModal').modal('show');

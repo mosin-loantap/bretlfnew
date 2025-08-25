@@ -23,14 +23,15 @@ class RuleController extends Controller
             'rule_name' => 'required|string|max:255',
             'rule_type' => 'required|string|max:100',
             'priority' => 'required|integer|min:1',
+            'total_marks' => 'required|integer|min:1|max:100',
             'effective_from' => 'required|date',
             'effective_to' => 'nullable|date|after_or_equal:effective_from',
-            'status' => 'required|in:active,inactive',
+            'is_active' => 'required|boolean',
         ]);
 
         $rule = Rule::create($validated + [
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
+            'created_by' => auth()->id() ?? 1,
+            'updated_by' => auth()->id() ?? 1,
         ]);
 
         return response()->json($rule, 201);
@@ -52,12 +53,13 @@ class RuleController extends Controller
             'rule_name' => 'required|string|max:255',
             'rule_type' => 'required|string|max:100',
             'priority' => 'required|integer|min:1',
+            'total_marks' => 'required|integer|min:1|max:100',
             'effective_from' => 'required|date',
             'effective_to' => 'nullable|date|after_or_equal:effective_from',
-            'status' => 'boolean',
+            'is_active' => 'required|boolean',
         ]);
 
-        $validated['updated_by'] = 1;
+        $validated['updated_by'] = auth()->id() ?? 1;
 
         $rule->update($validated);
 

@@ -20,6 +20,8 @@ class RuleConditionSeeder extends Seeder
                 'variable_name' => 'salary',
                 'operator'    => '>=',
                 'value'       => '30000',
+                'marks'       => 30,
+                'is_mandatory' => true,
                 'created_by'  => 1,
                 'updated_by'  => 1,
             ]);
@@ -30,6 +32,8 @@ class RuleConditionSeeder extends Seeder
                 'variable_name' => 'age',
                 'operator'    => '>=',
                 'value'       => '21',
+                'marks'       => 20,
+                'is_mandatory' => true,
                 'created_by'  => 1,
                 'updated_by'  => 1,
             ]);

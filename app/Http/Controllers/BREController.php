@@ -31,7 +31,7 @@ class BREController extends Controller
             'products' => Product::count(),
             'rules' => Rule::count(),
             'applications' => Application::count(),
-            'active_rules' => Rule::where('status', true)->count(),
+            'active_rules' => Rule::where('is_active', true)->count(),
             'recent_applications' => Application::with(['partner', 'product'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
@@ -183,14 +183,11 @@ class BREController extends Controller
             'rule_name' => 'required|string|max:255',
             'rule_type' => 'required|string|max:255',
             'priority' => 'required|integer|min:1',
+            'total_marks' => 'required|integer|min:1|max:100',
             'effective_from' => 'required|date',
             'effective_to' => 'nullable|date|after:effective_from',
             'is_active' => 'boolean',
         ]);
-
-        // Convert is_active to status for database storage
-        $validated['status'] = $validated['is_active'] ?? true;
-        unset($validated['is_active']);
 
         Rule::create($validated + [
             'created_by' => 1,
@@ -199,6 +196,19 @@ class BREController extends Controller
 
         return redirect()->route('bre.rules.index')
             ->with('success', 'Rule created successfully!');
+    }
+
+    public function rulesApi()
+    {
+        $rules = Rule::with(['partner', 'product'])
+                     ->withCount(['conditions', 'actions'])
+                     ->orderBy('created_at', 'desc')
+                     ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $rules
+        ]);
     }
 
     public function ruleShow($id)
@@ -220,9 +230,10 @@ class BREController extends Controller
             'rule_name' => 'required|string|max:255',
             'rule_type' => 'required|string|max:255',
             'priority' => 'required|integer|min:1',
+            'total_marks' => 'required|integer|min:1|max:100',
             'effective_from' => 'required|date',
             'effective_to' => 'nullable|date|after:effective_from',
-            'status' => 'boolean',
+            'is_active' => 'boolean',
         ]);
 
         $validated['updated_by'] = 1;
@@ -232,7 +243,7 @@ class BREController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Rule updated successfully!',
-            'rule' => $rule->fresh()
+            'data' => $rule->fresh()
         ]);
     }
 
@@ -265,6 +276,8 @@ class BREController extends Controller
             'variable_name' => 'required|string|max:255',
             'operator' => 'required|string|max:50',
             'value' => 'required|string',
+            'marks' => 'required|integer|min:0|max:100',
+            'is_mandatory' => 'boolean',
         ]);
 
         RuleCondition::create($validated + [
@@ -371,7 +384,10 @@ class BREController extends Controller
     public function conditionShow($id)
     {
         $condition = RuleCondition::with('rule')->findOrFail($id);
-        return response()->json($condition);
+        return response()->json([
+            'success' => true,
+            'data' => $condition
+        ]);
     }
 
     /**
@@ -384,6 +400,8 @@ class BREController extends Controller
             'variable_name' => 'required|string|max:255',
             'operator' => 'required|string|max:50',
             'value' => 'required|string',
+            'marks' => 'required|integer|min:0|max:100',
+            'is_mandatory' => 'boolean',
         ]);
 
         $condition = RuleCondition::findOrFail($id);
@@ -391,7 +409,10 @@ class BREController extends Controller
             'updated_by' => 1,
         ]);
 
-        return response()->json($condition);
+        return response()->json([
+            'success' => true,
+            'data' => $condition
+        ]);
     }
 
     /**
@@ -448,7 +469,7 @@ class BREController extends Controller
 
             // Get active rules for this product
             $rules = Rule::where('product_id', $product->product_id)
-                          ->where('status', 1)
+                          ->where('is_active', 1)
                           ->with(['conditions', 'actions'])
                           ->orderBy('priority', 'desc')
                           ->get();
@@ -466,7 +487,7 @@ class BREController extends Controller
                     'rule_name' => $rule->rule_name,
                     'description' => $rule->description,
                     'priority' => $rule->priority,
-                    'status' => $rule->status,
+                    'status' => $rule->is_active,
                     'effective_from' => $rule->effective_from,
                     'effective_to' => $rule->effective_to,
                     'conditions' => $rule->conditions->map(function ($condition) {

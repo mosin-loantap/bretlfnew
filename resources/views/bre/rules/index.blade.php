@@ -36,19 +36,27 @@
             </div>
             
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <div class="mb-3">
                         <label for="rule_name" class="form-label">Rule Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="rule_name" name="rule_name" required>
                         <div class="invalid-feedback" id="rule_name_error"></div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label for="priority" class="form-label">Priority <span class="text-danger">*</span></label>
                         <input type="number" class="form-control" id="priority" name="priority" min="1" max="100" value="10" required>
                         <div class="form-text">1 = Highest, 100 = Lowest</div>
                         <div class="invalid-feedback" id="priority_error"></div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="total_marks" class="form-label">Total Marks <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="total_marks" name="total_marks" min="1" max="100" value="100" required>
+                        <div class="form-text">Maximum: 100</div>
+                        <div class="invalid-feedback" id="total_marks_error"></div>
                     </div>
                 </div>
             </div>
@@ -135,6 +143,7 @@
                         <th>Product</th>
                         <th>Type</th>
                         <th>Priority</th>
+                        <th>Total Marks</th>
                         <th>Conditions</th>
                         <th>Actions</th>
                         <th>Status</th>
@@ -143,7 +152,7 @@
                 </thead>
                 <tbody id="rulesTableBody">
                     <tr>
-                        <td colspan="9" class="text-center">
+                        <td colspan="10" class="text-center">
                             <div class="spinner-border spinner-border-sm me-2" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
@@ -192,18 +201,25 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="edit_rule_name" class="form-label">Rule Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="edit_rule_name" name="rule_name" required>
                                 <div class="invalid-feedback" id="edit_rule_name_error"></div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="edit_priority" class="form-label">Priority <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="edit_priority" name="priority" min="1" max="100" required>
                                 <div class="invalid-feedback" id="edit_priority_error"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="edit_total_marks" class="form-label">Total Marks <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="edit_total_marks" name="total_marks" min="1" max="100" required>
+                                <div class="invalid-feedback" id="edit_total_marks_error"></div>
                             </div>
                         </div>
                     </div>
@@ -499,7 +515,7 @@ function loadProductsByPartner(partnerId, selectId) {
 
 function loadRules() {
     $.ajax({
-        url: '/api/rules',
+        url: '/api/bre/rules',
         method: 'GET',
         success: function(response) {
             renderRules(response.data || response);
@@ -507,7 +523,7 @@ function loadRules() {
         error: function() {
             $('#rulesTableBody').html(`
                 <tr>
-                    <td colspan="9" class="text-center text-danger">
+                    <td colspan="10" class="text-center text-danger">
                         <i class="fas fa-exclamation-triangle"></i> Error loading rules
                     </td>
                 </tr>
@@ -522,7 +538,7 @@ function renderRules(rules) {
     if (rules.length === 0) {
         tbody.html(`
             <tr>
-                <td colspan="9" class="text-center text-muted">
+                <td colspan="10" class="text-center text-muted">
                     <i class="fas fa-list-alt fa-2x mb-2"></i><br>
                     No rules found
                 </td>
@@ -533,7 +549,7 @@ function renderRules(rules) {
     
     let html = '';
     rules.forEach(rule => {
-        const statusBadge = rule.status ? 
+        const statusBadge = rule.is_active ? 
             '<span class="badge bg-success">Active</span>' : 
             '<span class="badge bg-secondary">Inactive</span>';
         
@@ -543,7 +559,7 @@ function renderRules(rules) {
         const actionsCount = rule.actions_count || rule.actions?.length || 0;
         
         html += `
-            <tr data-partner-id="${rule.partner_id}" data-status="${rule.status}">
+            <tr data-partner-id="${rule.partner_id}" data-status="${rule.is_active}">
                 <td>
                     <strong>${rule.rule_name}</strong>
                     ${rule.description ? `<br><small class="text-muted">${rule.description.substring(0, 50)}${rule.description.length > 50 ? '...' : ''}</small>` : ''}
@@ -553,6 +569,9 @@ function renderRules(rules) {
                 <td><span class="badge bg-info">${rule.rule_type || 'eligibility'}</span></td>
                 <td>
                     <span class="badge bg-${rule.priority <= 10 ? 'danger' : rule.priority <= 50 ? 'warning' : 'secondary'}">${rule.priority}</span>
+                </td>
+                <td>
+                    <span class="badge bg-primary">${rule.total_marks || 100}</span>
                 </td>
                 <td>
                     <span class="badge bg-primary">${conditionsCount} conditions</span>
@@ -597,7 +616,8 @@ function viewRule(ruleId) {
                             <tr><td><strong>Rule Name:</strong></td><td>${rule.rule_name}</td></tr>
                             <tr><td><strong>Type:</strong></td><td>${rule.rule_type || 'eligibility'}</td></tr>
                             <tr><td><strong>Priority:</strong></td><td>${rule.priority}</td></tr>
-                            <tr><td><strong>Status:</strong></td><td>${rule.status ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td></tr>
+                            <tr><td><strong>Total Marks:</strong></td><td>${rule.total_marks || 100}</td></tr>
+                            <tr><td><strong>Status:</strong></td><td>${rule.is_active ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>'}</td></tr>
                             <tr><td><strong>Created:</strong></td><td>${new Date(rule.created_at).toLocaleDateString()}</td></tr>
                         </table>
                     </div>
@@ -675,7 +695,8 @@ function editRule(ruleId) {
             $('#edit_partner_id').val(rule.partner_id);
             $('#edit_rule_name').val(rule.rule_name);
             $('#edit_priority').val(rule.priority);
-            $('#edit_is_active').val(rule.status ? '1' : '0');
+            $('#edit_total_marks').val(rule.total_marks || 100);
+            $('#edit_is_active').val(rule.is_active ? '1' : '0');
             $('#edit_rule_type').val(rule.rule_type || 'eligibility');
             $('#edit_effective_from').val(rule.effective_from);
             $('#edit_effective_to').val(rule.effective_to);
@@ -752,6 +773,7 @@ function resetForm() {
     $('#ruleForm')[0].reset();
     $('#product_id').html('<option value="">Select Product</option>').prop('disabled', true);
     $('#effective_from').val('{{ date("Y-m-d") }}'); // Reset to today's date
+    $('#total_marks').val('100'); // Reset to default value
     clearErrors();
     $('#rule_name').focus();
 }

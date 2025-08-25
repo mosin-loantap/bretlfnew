@@ -14,9 +14,10 @@ class Rule extends Model
         'rule_name',
         'rule_type',
         'priority',
+        'total_marks',
         'effective_from',
         'effective_to',
-        'status',
+        'is_active',
         'created_by',
         'updated_by'
     ];

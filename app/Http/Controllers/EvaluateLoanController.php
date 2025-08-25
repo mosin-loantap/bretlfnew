@@ -29,6 +29,8 @@ class EvaluateLoanController extends Controller
                 'applicant.name' => 'sometimes|string',
                 'applicant.requested_amount' => 'sometimes|numeric|min:0',
                 'applicant.requested_tenure' => 'sometimes|integer|min:1',
+                // Allow any additional fields in applicant array
+                'applicant.*' => 'sometimes',
             ]);
 
             Log::info('Loan evaluation request received', $validated);

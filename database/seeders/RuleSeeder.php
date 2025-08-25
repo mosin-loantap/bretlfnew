@@ -20,9 +20,10 @@ class RuleSeeder extends Seeder
                 'rule_name' => 'Check Salary Eligibility',
                 'rule_type' => 'Eligibility',
                 'priority' => 1,
+                'total_marks' => 100,
                 'effective_from' => '2025-01-01',
                 'effective_to' => null,
-                'status' => true,
+                'is_active' => true,
                 'created_by' => 1,
                 'updated_by' => 1,
             ]);
