@@ -505,8 +505,8 @@ class RuleEvaluationService
             if ($ruleResult['pass_percentage'] > $highest['percentage']) {
                 $highest = [
                     'rule_name' => $ruleResult['rule_name'],
-                    'percentage' => $ruleResult['pass_percentage'],
-                    'marks' => $ruleResult['achieved_marks'],
+                    'percentage' => $ruleResult['pass_percentage']."%",
+                    'achieved_marks' => $ruleResult['achieved_marks'],
                     'total' => $ruleResult['total_marks']
                 ];
             }
